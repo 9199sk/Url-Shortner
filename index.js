@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express')
 const app = express()
-const port = 8002;
+const port = process.env.PORT || 3000;
+const MongoUrl= process.env.MONGO_URI || "mongodb://127.0.0.1:27017/short-url"
 const urlRoutes = require("./routes/url.js");
 const { connectMongoDb } = require('./connect.js');
 const bodyParser = require('body-parser');
@@ -32,7 +34,7 @@ app.set("view engine", "views");
 
 
 //this is mongoDb connection-----
-connectMongoDb('mongodb://127.0.0.1:27017/short-url');
+connectMongoDb(MongoUrl);
 
 
 app.use(checkForAuthentication);
