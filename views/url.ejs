@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #2e3045, #04193c);
+            color: white;
+             font-family: Arial, sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .url-card {
+            background-color: #222222;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-copy {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+       <!-- Display Flash Messages -->
+       <% if (LoginMessage && LoginMessage.length > 0) { %>
+        <h2 style="color: green;"><%= LoginMessage %></h2>
+    <% } %>
+
+    <!-- Check for deleteMessage -->
+    <% if (deleteMessage && deleteMessage.length > 0) { %>
+        <h2 style="color: red;"><%= deleteMessage %></h2>
+    <% } %>
+
+    <!-- Check for newUrlMessage -->
+    <% if (newUrlMessage && newUrlMessage.length > 0) { %>
+        <p style="color: blue;"><%= newUrlMessage %></p>
+    <% } %>
+        <div class="header">
+            <h1>URL Shortener</h1>
+            <p>Shorten, manage, and track your URLs effortlessly!</p>
+        </div>
+
+        <!-- URL Input Form -->
+        <div class="url-card">
+            <form action="/url" method="POST">
+                <div class="mb-3">
+                    <label for="redirectUrl" class="form-label">Enter URL to Shorten:</label>
+                    <input type="url" class="form-control" id="redirectUrl" name="redirectUrl"
+                        placeholder="https://example.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Shorten URL</button>
+            </form>
+        </div>
+
+        <!-- List of Shortened URLs -->
+        <% if (urlData.length> 0) { %>
+            <h3>Your URLs</h3>
+            <% urlData.forEach(data=> { %>
+                <div class="url-card">
+                    <p><strong>Original URL:</strong> <a href="<%= data.redirectUrl %>" target="_blank">
+                            <%= data.redirectUrl %>
+                        </a></p>
+                    <p><strong>Shortened URL:</strong>
+                        <a href="/url/<%= data.shortId %>" target="_blank">/<%= data.shortId %></a>
+                        <button class="btn btn-secondary btn-sm btn-copy"
+                            onclick="copyToClipboard('<%= data.shortId %>')">Copy</button>
+                    </p>
+                    <p><strong>Created At:</strong>
+                        <%= new Date(data.createdAt).toLocaleString() %>
+                    </p>
+                    <p><strong>Visit Count:</strong>
+                        <%= data.visitHistory.length %>
+                    </p>
+                    <form action="/url/<%= data.shortId %>" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+                <% }) %>
+                    <% } else { %>
+                        <p>No URLs found. Start by shortening a new URL above!</p>
+                        <% } %>
+    </div>
+
+    <script>
+        function copyToClipboard(shortId) {
+            const url = `${window.location.origin}/url/${shortId}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Shortened URL copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy URL: ', err);
+            });
+        }
+    </script>
+</body>
+
+</html>
